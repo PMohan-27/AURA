@@ -1,1 +1,1 @@
-# AURA
+# AURA - Adaptive Understanding & Responsive Assistant
