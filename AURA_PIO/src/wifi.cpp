@@ -1,7 +1,7 @@
 #include "main.cpp"
 #include <WiFi.h>
 
-// Replace with your network credentials
+
 const char* ssid     = "your_wifi_ssid";
 const char* password = "your_wifi_password";
 
@@ -12,10 +12,10 @@ void setup() {
   Serial.println();
   Serial.println("Connecting to WiFi...");
 
-  // Start connecting
+  
   WiFi.begin(ssid, password);
 
-  // Wait until connected
+  
   int retryCount = 0;
   while (WiFi.status() != WL_CONNECTED && retryCount < 20) {
     delay(500);
@@ -25,7 +25,7 @@ void setup() {
 
   Serial.println();
 
-  // Check connection result
+  
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("WiFi connected successfully!");
     Serial.print("SSID: ");
@@ -38,7 +38,7 @@ void setup() {
 }
 
 void loop() {
-  // Keep checking WiFi status
+  
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi disconnected! Reconnecting...");
     WiFi.reconnect();

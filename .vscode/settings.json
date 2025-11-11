@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/LENOVO/Documents/GitHub/AURA/AURA_PIO"
+    "cmake.sourceDirectory": "C:/Users/LENOVO/Documents/GitHub/AURA/AURA_PIO",
+    "C_Cpp.errorSquiggles": "enabled"
 }
