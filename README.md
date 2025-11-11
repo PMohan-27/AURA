@@ -29,11 +29,12 @@ Sample rate:
 
 16000 Hz mono (for Whisper + Hugging Face compatibility)  
 
-                                 |
+| Function                 | API / Library                                     | Description                                   |
 | ------------------------ | ------------------------------------------------- | --------------------------------------------- |
 | **Speech-to-Text**       | `SpeechRecognition` (Google STT) or `Whisper API` | Converts mic audio → text                     |
 | **Therapy Logic / Chat** | Hugging Face API (`flan-t5-small`)                | Generates empathetic, conversational response |
 | **Text-to-Speech**       | `gTTS` (Google TTS)                               | Converts reply text → audio (WAV/PCM)         |
 | **Serial Communication** | `pyserial`                                        | Sends/receives audio with ESP32               |
 | **Audio I/O**            | `soundfile`, `numpy`                              | Handles WAV encoding and PCM conversion       |
+
 
