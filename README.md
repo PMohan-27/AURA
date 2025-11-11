@@ -27,7 +27,9 @@ Streams audio to Adafruit I²S amplifier
 
 Sample rate:
 
-16000 Hz mono (for Whisper + Hugging Face compatibility)                                   |
+16000 Hz mono (for Whisper + Hugging Face compatibility)  
+
+                                 |
 | ------------------------ | ------------------------------------------------- | --------------------------------------------- |
 | **Speech-to-Text**       | `SpeechRecognition` (Google STT) or `Whisper API` | Converts mic audio → text                     |
 | **Therapy Logic / Chat** | Hugging Face API (`flan-t5-small`)                | Generates empathetic, conversational response |
