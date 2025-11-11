@@ -1,11 +1,14 @@
-#include "main.cpp"
+#include <Arduino.h>
 #include <WiFi.h>
+#include "wifi.hpp"
+
+
 
 
 const char* ssid     = "your_wifi_ssid";
 const char* password = "your_wifi_password";
 
-void setup() {
+void init_Wifi() {
   Serial.begin(115200);
   delay(1000);
 
@@ -37,15 +40,3 @@ void setup() {
   }
 }
 
-void loop() {
-  
-  if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("WiFi disconnected! Reconnecting...");
-    WiFi.reconnect();
-    delay(5000);
-  } else {
-    Serial.print("WiFi connected, IP: ");
-    Serial.println(WiFi.localIP());
-    delay(10000);
-  }
-}
