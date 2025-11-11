@@ -31,7 +31,7 @@ Sample rate:
 
 | Function                 | API / Library                                     | Description                                   |
 | ------------------------ | ------------------------------------------------- | --------------------------------------------- |
-| **Speech-to-Text**       | `SpeechRecognition` (Google STT) or `Whisper API` | Converts mic audio → text                     |
+| **Speech-to-Text**       | `SpeechRecognition` (Google STT)                  | Converts mic audio → text                     |
 | **Therapy Logic / Chat** | Hugging Face API (`flan-t5-small`)                | Generates empathetic, conversational response |
 | **Text-to-Speech**       | `gTTS` (Google TTS)                               | Converts reply text → audio (WAV/PCM)         |
 | **Serial Communication** | `pyserial`                                        | Sends/receives audio with ESP32               |
