@@ -28,8 +28,8 @@ recognizer = sr.Recognizer()
 
 
 def read_audio_from_esp32(duration=RECORD_SECONDS):
-    """Reads raw PCM samples from ESP32 and saves to WAV."""
-    print(f"🎙️ Recording {duration}s from ESP32 mic...")
+    
+    print(f" Recording {duration}s from ESP32 mic...")
     raw_data = bytearray()
     start_time = time.time()
     while time.time() - start_time < duration:
@@ -42,11 +42,11 @@ def read_audio_from_esp32(duration=RECORD_SECONDS):
 
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
     sf.write(tmp.name, audio, SAMPLE_RATE)
-    print(f"🎧 Saved temp audio: {tmp.name}")
+    print(f"Saved temp audio: {tmp.name}")
     return tmp.name
 
 def speech_to_text(wav_path):
-    """Use local STT via Google SpeechRecognition."""
+
     with sr.AudioFile(wav_path) as source:
         audio = recognizer.record(source)
         try:
@@ -61,10 +61,10 @@ def speech_to_text(wav_path):
             return ""
 
 def therapy_reply(user_text):
-    """Send to Hugging Face flan-t5-small."""
+   
     if not user_text:
         return "Sorry, I didn’t catch that. Could you repeat?"
-    print("🤖 Thinking...")
+    print(" Thinking...")
     headers = {"Authorization": f"Bearer {HF_TOKEN}"}
     payload = {"inputs": f"You are a kind therapy assistant. User: {user_text}\nAssistant:"}
     try:
@@ -79,7 +79,7 @@ def therapy_reply(user_text):
         return "I'm having trouble thinking right now."
 
 def text_to_speech(reply_text):
-    """Convert text to PCM16 WAV using gTTS."""
+
     print("🎙️ Converting to speech...")
     tts = gTTS(reply_text, lang="en")
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
@@ -93,16 +93,16 @@ def text_to_speech(reply_text):
     return pcm_data
 
 def send_audio_to_esp32(pcm_data):
-    """Streams WAV PCM data to ESP32 speaker."""
-    print("🔊 Sending audio to ESP32...")
+    
+    print("Sending audio to ESP32...")
     chunk_size = 512
     for i in range(0, len(pcm_data), chunk_size):
         ser.write(pcm_data[i:i+chunk_size])
         time.sleep(0.005)
-    print("✅ Done streaming.\n")
+    print("Done streaming.\n")
 
 
-print("🧠 Therapy Bot Bridge ready! Press Ctrl+C to stop.\n")
+print("Therapy Bot Bridge ready! Press Ctrl+C to stop.\n")
 
 while True:
     try:
@@ -113,7 +113,7 @@ while True:
             pcm = text_to_speech(reply)
             send_audio_to_esp32(pcm)
     except KeyboardInterrupt:
-        print("\n🛑 Exiting gracefully.")
+        print("\nExiting gracefully.")
         break
     except Exception as e:
-        print("⚠️ Error:", e)
+        print("Error:", e)
