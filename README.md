@@ -2,8 +2,8 @@
 Developed by Parasinder Mohan, Krrish Lala, Luca Seaman
 
 Tools used - 
-     💻 SOFTWARE SETUP
-🧩 ESP32 Firmware
+     SOFTWARE SETUP
+ ESP32 Firmware
 
 Written in Arduino (C++) using:
 
