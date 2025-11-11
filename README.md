@@ -2,12 +2,32 @@
 Developed by Parasinder Mohan, Krrish Lala, Luca Seaman
 
 Tools used - 
-     (1) Hardwarre - 
-                    ESP 32
-                    Adafruit 1314 4Ω 3W
-                    DFRobot Fermion: I2S MEMS Microphone (Breakout) module.
-     (2) Software - 
-                    | Function                 | API / Library                                     | Description                                   |
+     💻 SOFTWARE SETUP
+🧩 ESP32 Firmware
+
+Written in Arduino (C++) using:
+
+WiFi.h
+
+WiFiClientSecure.h
+
+HTTPClient.h
+
+driver/i2s.h
+
+Functions:
+
+Captures audio from the Fermion I²S mic
+
+Sends raw PCM over Serial USB to the laptop
+
+Receives AI-generated PCM audio from laptop
+
+Streams audio to Adafruit I²S amplifier
+
+Sample rate:
+
+16000 Hz mono (for Whisper + Hugging Face compatibility)                                   |
 | ------------------------ | ------------------------------------------------- | --------------------------------------------- |
 | **Speech-to-Text**       | `SpeechRecognition` (Google STT) or `Whisper API` | Converts mic audio → text                     |
 | **Therapy Logic / Chat** | Hugging Face API (`flan-t5-small`)                | Generates empathetic, conversational response |
