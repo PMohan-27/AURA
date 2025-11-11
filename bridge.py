@@ -21,7 +21,7 @@ RECORD_SECONDS = 4
 
 ser = serial.Serial(ESP32_PORT, BAUD_RATE, timeout=1)
 time.sleep(2)
-print("✅ Connected to ESP32")
+print("Connected to ESP32")
 
 recognizer = sr.Recognizer()
 
@@ -54,10 +54,10 @@ def speech_to_text(wav_path):
             print(f"🧍 You: {text}")
             return text
         except sr.UnknownValueError:
-            print("⚠️ Could not understand.")
+            print("Could not understand.")
             return ""
         except Exception as e:
-            print("⚠️ STT Error:", e)
+            print("STT Error:", e)
             return ""
 
 def therapy_reply(user_text):
@@ -72,15 +72,15 @@ def therapy_reply(user_text):
             f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}",
             headers=headers, json=payload, timeout=60)
         reply = resp.json()[0]["generated_text"]
-        print(f"🧠 Bot: {reply}")
+        print(f"Bot: {reply}")
         return reply
     except Exception as e:
-        print("⚠️ Hugging Face Error:", e)
+        print("Hugging Face Error:", e)
         return "I'm having trouble thinking right now."
 
 def text_to_speech(reply_text):
 
-    print("🎙️ Converting to speech...")
+    print("Converting to speech...")
     tts = gTTS(reply_text, lang="en")
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
     tts.save(tmp.name)
