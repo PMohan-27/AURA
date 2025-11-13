@@ -15,7 +15,7 @@ BAUD = 115200
 SAMPLE_RATE = 16000
 RECORD_SECONDS = 10
 
-HF_TOKEN = "hf_your_token_here"
+HF_TOKEN = "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"
 HUGGINGFACE_MODEL = "google/flan-t5-small"
 
 ser = serial.Serial(ESP32_PORT, BAUD, timeout=1)
