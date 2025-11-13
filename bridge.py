@@ -16,7 +16,7 @@ BAUD = 115200
 RATE = 4000             # sample rate must match ESP32 SAMPLE_RATE
 SECONDS = 5             # recording duration per turn
 
-HF_TOKEN = "hf_your_token_here"
+HF_TOKEN = "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"
 HUGGINGFACE_MODEL = "google/flan-t5-small"
 
 ser = serial.Serial(PORT, BAUD, timeout=0.1)
