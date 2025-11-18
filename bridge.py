@@ -11,9 +11,9 @@ import tempfile
 # --------------------------
 # CONFIG
 # --------------------------
-PORT = "COM6"           # change if needed
+PORT = "COM3"           # change if needed
 BAUD = 115200
-RATE = 16000             # 4000 Hz sample rate
+RATE = 8000             # 4000 Hz sample rate
 SECONDS = 4             # recording duration
 
 HF_TOKEN = "hf_your_token_here"
@@ -29,6 +29,7 @@ recognizer = sr.Recognizer()
 # STEP 1: Record analog mic samples
 # --------------------------
 def record_audio():
+    return "D:\\AURA\\AURA\\resampled_resampy.wav"
     print("Recording from ESP32 analog mic...")
     samples = []
     start_time = time.time()
@@ -67,7 +68,7 @@ def speech_to_text(wav_path):
         print("User:", text)
         return text
     except:
-        return ""
+        return "FAIL"
 
 # --------------------------
 # STEP 3: Hugging Face Therapy Model
@@ -131,6 +132,7 @@ try:
             continue
 
         text = speech_to_text(wav)
+        print(text)
         reply = get_therapy_reply(text)
         pcm = tts_to_pcm(reply)
         send_audio_to_esp32(pcm)

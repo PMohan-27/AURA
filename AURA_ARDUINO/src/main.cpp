@@ -1,24 +1,26 @@
 #include <Arduino.h>
 
-#define MIC_PIN A0         // ADC pin connected to mic
-#define SAMPLE_RATE 16000   // 8 kHz sampling
-
-const unsigned long samplePeriod = 1000000UL / SAMPLE_RATE;
-unsigned long lastMicros = 0;
+#define MIC_PIN A0
+#define SAMPLE_RATE 8000              // 8 kHz
+#define SAMPLE_PERIOD_US 0 // 125 us
 
 void setup() {
-  Serial.begin(921600);         // high baud for streaming
-  analogReadResolution(12);     // 12-bit ADC
+  Serial.begin(921600);             // High-speed serial
+  analogReadResolution(14);         // 14-bit ADC (0-16383)
 }
 
 void loop() {
+  static unsigned long startTime = micros();
+  static unsigned long lastSampleTime = startTime;
+
   unsigned long now = micros();
-  if (now - lastMicros >= samplePeriod) {
-    lastMicros += samplePeriod;
-    
-    int raw = analogRead(MIC_PIN);    // 0–4095
-    uint16_t sample = raw;            // store as 16-bit
-    // Send LSB first, then MSB
+
+  if (now - lastSampleTime >= SAMPLE_PERIOD_US) {
+    lastSampleTime += SAMPLE_PERIOD_US;
+
+    int sample = analogRead(MIC_PIN);   // 14-bit ADC
+
+    // Send sample to PC (2 bytes, LSB first)
     Serial.write(sample & 0xFF);
     Serial.write((sample >> 8) & 0xFF);
   }
