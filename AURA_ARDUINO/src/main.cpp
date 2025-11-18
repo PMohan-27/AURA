@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #define MIC_PIN A0         // ADC pin connected to mic
-#define SAMPLE_RATE 8000   // 8 kHz sampling
+#define SAMPLE_RATE 16000   // 8 kHz sampling
 
 const unsigned long samplePeriod = 1000000UL / SAMPLE_RATE;
 unsigned long lastMicros = 0;

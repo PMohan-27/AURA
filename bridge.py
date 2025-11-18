@@ -13,7 +13,7 @@ import tempfile
 # --------------------------
 PORT = "COM6"           # change if needed
 BAUD = 115200
-RATE = 4000             # 4000 Hz sample rate
+RATE = 16000             # 4000 Hz sample rate
 SECONDS = 4             # recording duration
 
 HF_TOKEN = "hf_your_token_here"
