@@ -16,11 +16,12 @@ BAUD = 921600
 RATE = 6500             
 SECONDS = 5             # recording duration
 TARGET_RATE = 13000
-HF_TOKEN = "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"
+HF_TOKEN = "MY_API_KEY"
 HUGGINGFACE_MODEL = "google/flan-t5-small"
 
 ser = serial.Serial(PORT, BAUD, timeout=0.1)
 ser.reset_input_buffer()
+ser.reset_output_buffer()
 
 # time.sleep(2)
 print("Connected to Arduino")
@@ -96,24 +97,49 @@ def speech_to_text(wav_path):
 # --------------------------
 def get_therapy_reply(text):
     if not text:
-        return "I could not understand you. Please try again."
+        return "I could not understand you. Please try speaking again."
 
-    print("Querying Hugging Face model...")
-    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
-    payload = {
-        "inputs": f"You are a calm, friendly therapy assistant. User said: {text}\nAssistant:"
+    print("Querying HuggingFace (free API)...")
+
+    url = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
+
+    headers = {
+        "Authorization": f"Bearer {HF_TOKEN}",
+        "Content-Type": "application/json"
     }
 
-    resp = requests.post(
-        f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}",
-        json=payload,
-        headers=headers,
-        timeout=60
-    )
+    payload = {
+        "inputs": f"You are a calm, friendly therapy assistant. User said: {text}\nAssistant:",
+        "parameters": {"max_new_tokens": 80}
+    }
 
-    reply = resp.json()[0]["generated_text"]
-    print("Bot:", reply)
-    return reply
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=60)
+    except Exception as e:
+        print("HF Request Failed:", e)
+        return "I am having trouble connecting to the model right now."
+
+    try:
+        data = resp.json()
+    except Exception:
+        print("HF returned invalid JSON.")
+        return "The model returned an invalid response."
+
+    print("HF raw:", data)
+
+    # Standard HF response format
+    if isinstance(data, list) and len(data) > 0:
+        if "generated_text" in data[0]:
+            reply = data[0]["generated_text"]
+            print("Bot:", reply)
+            return reply
+
+    # Error from HF
+    if isinstance(data, dict) and "error" in data:
+        return f"Model error: {data['error']}"
+
+    return "Unexpected response format from HuggingFace."
+
 
 # --------------------------
 # STEP 4: Convert TTS to PCM16
