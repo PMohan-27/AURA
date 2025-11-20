@@ -2,7 +2,7 @@
 
 #define MIC_PIN A0
 #define SAMPLE_RATE 8000              // 8 kHz
-#define SAMPLE_PERIOD_US 0 // 125 us
+#define SAMPLE_PERIOD_US 1/SAMPLE_RATE // 125 us
 
 void setup() {
   Serial.begin(921600);             // High-speed serial
@@ -11,6 +11,7 @@ void setup() {
 
 void loop() {
   static unsigned long startTime = micros();
+  startTime /= 1000000;
   static unsigned long lastSampleTime = startTime;
 
   unsigned long now = micros();

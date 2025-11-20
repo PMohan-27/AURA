@@ -7,21 +7,23 @@ import speech_recognition as sr
 from gtts import gTTS
 import soundfile as sf
 import tempfile
-
+import resampy
 # --------------------------
 # CONFIG
 # --------------------------
 PORT = "COM3"           # change if needed
-BAUD = 115200
-RATE = 8000             # 4000 Hz sample rate
-SECONDS = 4             # recording duration
-
-HF_TOKEN = "hf_your_token_here"
+BAUD = 921600   
+RATE = 6500             
+SECONDS = 5             # recording duration
+TARGET_RATE = 13000
+HF_TOKEN = "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"
 HUGGINGFACE_MODEL = "google/flan-t5-small"
 
 ser = serial.Serial(PORT, BAUD, timeout=0.1)
-time.sleep(2)
-print("Connected to ESP32")
+ser.reset_input_buffer()
+
+# time.sleep(2)
+print("Connected to Arduino")
 
 recognizer = sr.Recognizer()
 
@@ -29,32 +31,51 @@ recognizer = sr.Recognizer()
 # STEP 1: Record analog mic samples
 # --------------------------
 def record_audio():
-    return "D:\\AURA\\AURA\\resampled_resampy.wav"
-    print("Recording from ESP32 analog mic...")
+    # ser = serial.Serial(PORT, BAUD, timeout=0.1)
     samples = []
-    start_time = time.time()
 
+    print("Recording...")
+    ser.reset_input_buffer()
+    start_time = time.time()
     while time.time() - start_time < SECONDS:
         if ser.in_waiting >= 2:
             data = ser.read(2)
-            val = int.from_bytes(data, "little")
+            val = int.from_bytes(data, 'little')
             samples.append(val)
+            
+    # ser.close()
+    print("Finished recording.")
 
-    if not samples:
-        print("No samples received.")
-        return None
+    # --------------------------
+    # Convert to signed PCM
+    # --------------------------
+    samples = np.array(samples, dtype=np.float32)
+    samples = (samples - 8192) / 8192.0        # center around 0
+    samples = samples.astype(np.float32)
 
-    samples = np.array(samples, dtype=np.uint16)   # unsigned 16-bit
+    # --------------------------
+    # Estimate actual sample rate
+    # --------------------------
+    actual_rate = len(samples) / SECONDS
+    print("Actual Arduino sample rate:", actual_rate)
 
-    # convert unsigned 16-bit (0–65535) → signed 16-bit (-32768 to +32767)
-    samples = samples.astype(np.int32)
-    samples = samples - 32768
-    samples = samples.astype(np.int16)
+    # --------------------------
+    # Resample to target rate using Resampy
+    # --------------------------
+    resampled = resampy.resample(samples, sr_orig=actual_rate, sr_new=TARGET_RATE)
 
-    wav_path = "recording.wav"
-    write(wav_path, RATE, samples)
-    print(f"Saved {wav_path} ({len(samples)} samples)")
-    return wav_path
+    # Scale to 16-bit PCM for saving
+    resampled_int16 = np.int16(resampled * 32767)
+
+    # --------------------------
+    # Save WAV (optional)
+    # --------------------------
+    write("resampled_resampy.wav", TARGET_RATE, resampled_int16)
+    print(f"Saved resampled_resampy.wav at {TARGET_RATE} Hz")
+
+    return "resampled_resampy.wav"
+    
+
 
 # --------------------------
 # STEP 2: Speech-to-Text
@@ -138,5 +159,6 @@ try:
         send_audio_to_esp32(pcm)
 
 except KeyboardInterrupt:
+    exit()
     print("Exiting.")
     ser.close()

@@ -9,13 +9,14 @@ import time
 PORT = "COM3"
 BAUD = 921600
 SECONDS = 5
-TARGET_RATE = 10000  # Target sample rate for STT
+TARGET_RATE = 13000  # Target sample rate for STT
 
 # --------------------------
 # Read from Arduino
 # --------------------------
 ser = serial.Serial(PORT, BAUD, timeout=0.1)
 samples = []
+ser.reset_input_buffer()
 
 print("Recording...")
 start_time = time.time()
@@ -31,7 +32,7 @@ print("Finished recording.")
 # Convert to signed PCM
 # --------------------------
 samples = np.array(samples, dtype=np.float32)
-samples = (samples - 2048) / 2048.0        # center around 0
+samples = (samples - 8192) / 8192.0        # center around 0
 samples = samples.astype(np.float32)
 
 # --------------------------
