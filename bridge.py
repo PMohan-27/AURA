@@ -15,9 +15,13 @@ PORT = "COM3"           # change if needed
 BAUD = 921600   
 RATE = 6500             
 SECONDS = 5             # recording duration
-TARGET_RATE = 13000
-HF_TOKEN = "MY_API_KEY"
-HUGGINGFACE_MODEL = "google/flan-t5-small"
+TARGET_RATE = 15000
+NUM_SAMPLES = 26000
+AZURE_ENDPOINT = "https://therapy-bot.openai.azure.com/"   # <-- CHANGE THIS
+AZURE_API_KEY = "ExLr27WBO13n6Hkzki6sPk6pa9z3htoUHUIWI5vwBfqehlI2ZxozJQQJ99BKACHYHv6XJ3w3AAABACOG1TzC"                            # <-- CHANGE THIS
+AZURE_DEPLOYMENT = "gpt-4o-mini"                           # <-- CHECK THIS
+AZURE_API_VERSION = "2024-08-01-preview"
+
 
 ser = serial.Serial(PORT, BAUD, timeout=0.1)
 ser.reset_input_buffer()
@@ -32,50 +36,35 @@ recognizer = sr.Recognizer()
 # STEP 1: Record analog mic samples
 # --------------------------
 def record_audio():
-    # ser = serial.Serial(PORT, BAUD, timeout=0.1)
     samples = []
 
     print("Recording...")
     ser.reset_input_buffer()
-    start_time = time.time()
-    while time.time() - start_time < SECONDS:
+    ser.write(b'R')  # send handshake
+
+    while len(samples) < NUM_SAMPLES:
         if ser.in_waiting >= 2:
             data = ser.read(2)
             val = int.from_bytes(data, 'little')
             samples.append(val)
-            
-    # ser.close()
+
     print("Finished recording.")
 
-    # --------------------------
-    # Convert to signed PCM
-    # --------------------------
+    # Convert to float PCM centered around 0
     samples = np.array(samples, dtype=np.float32)
-    samples = (samples - 8192) / 8192.0        # center around 0
-    samples = samples.astype(np.float32)
+    samples -= np.mean(samples)
+    samples /= np.max(np.abs(samples))
 
-    # --------------------------
-    # Estimate actual sample rate
-    # --------------------------
-    actual_rate = len(samples) / SECONDS
-    print("Actual Arduino sample rate:", actual_rate)
+    # Resample to target rate
+    resampled = resampy.resample(samples, sr_orig=6500, sr_new=TARGET_RATE)
 
-    # --------------------------
-    # Resample to target rate using Resampy
-    # --------------------------
-    resampled = resampy.resample(samples, sr_orig=actual_rate, sr_new=TARGET_RATE)
-
-    # Scale to 16-bit PCM for saving
+    # Convert to int16 PCM
     resampled_int16 = np.int16(resampled * 32767)
 
-    # --------------------------
-    # Save WAV (optional)
-    # --------------------------
     write("resampled_resampy.wav", TARGET_RATE, resampled_int16)
     print(f"Saved resampled_resampy.wav at {TARGET_RATE} Hz")
 
     return "resampled_resampy.wav"
-    
 
 
 # --------------------------
@@ -97,48 +86,48 @@ def speech_to_text(wav_path):
 # --------------------------
 def get_therapy_reply(text):
     if not text:
-        return "I could not understand you. Please try speaking again."
+        return "I could not understand you. Please try again."
 
-    print("Querying HuggingFace (free API)...")
+    print("Querying Azure GPT-4o-mini...")
 
-    url = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
+    url = (
+        f"{AZURE_ENDPOINT}"
+        f"openai/deployments/{AZURE_DEPLOYMENT}/chat/completions"
+        f"?api-version={AZURE_API_VERSION}"
+    )
 
     headers = {
-        "Authorization": f"Bearer {HF_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "api-key": AZURE_API_KEY,
     }
 
     payload = {
-        "inputs": f"You are a calm, friendly therapy assistant. User said: {text}\nAssistant:",
-        "parameters": {"max_new_tokens": 80}
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a calm, supportive, friendly therapy assistant."
+            },
+            {
+                "role": "user",
+                "content": text
+            }
+        ],
+        "max_tokens": 80,
+        "temperature": 0.7,
     }
 
-    try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=60)
-    except Exception as e:
-        print("HF Request Failed:", e)
-        return "I am having trouble connecting to the model right now."
+    resp = requests.post(url, json=payload, headers=headers)
 
-    try:
-        data = resp.json()
-    except Exception:
-        print("HF returned invalid JSON.")
-        return "The model returned an invalid response."
+    if resp.status_code != 200:
+        print("Azure Error:", resp.text)
+        return "I'm having trouble right now, please try again."
 
-    print("HF raw:", data)
+    data = resp.json()
+    reply = data["choices"][0]["message"]["content"]
+    print("Bot:", reply)
+    return reply
 
-    # Standard HF response format
-    if isinstance(data, list) and len(data) > 0:
-        if "generated_text" in data[0]:
-            reply = data[0]["generated_text"]
-            print("Bot:", reply)
-            return reply
 
-    # Error from HF
-    if isinstance(data, dict) and "error" in data:
-        return f"Model error: {data['error']}"
-
-    return "Unexpected response format from HuggingFace."
 
 
 # --------------------------
@@ -150,23 +139,42 @@ def tts_to_pcm(text):
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
     tts.save(tmp.name)
 
-    audio, sr_ = sf.read(tmp.name, dtype='int16')
+    audio, sr_ = sf.read(tmp.name, dtype='float32')
     if audio.ndim > 1:
         audio = audio[:, 0]  # mono
+        
+    resampled = resampy.resample(audio, sr_, TARGET_RATE)
 
-    return audio.tobytes()
+    # Clip to avoid overshoot
+    resampled = np.clip(resampled, -1.0, 1.0)
+
+    # Convert to int16 PCM
+    pcm_int16 = (resampled * 32767).astype(np.int16)
+    print(sr_)
+    return pcm_int16.tobytes()
 
 # --------------------------
 # STEP 5: Send PCM16 audio back to ESP32
 # --------------------------
-def send_audio_to_esp32(pcm_data):
-    print("Sending audio to ESP32...")
-    chunk = 256
-    for i in range(0, len(pcm_data), chunk):
-        ser.write(pcm_data[i:i+chunk])
-        time.sleep(0.002)
-    print("Playback complete.\n")
+def send_audio_to_arduino(pcm_data):
+    print("Sending audio to Arduino...")
 
+    # Step 1: Send handshake byte 'P'
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
+    ser.write(b'P')
+
+    # Step 2: Send 4-byte little-endian length (number of int16 samples)
+    num_samples = len(pcm_data) // 2
+    ser.write(num_samples.to_bytes(4, byteorder='little'))
+
+    # Step 3: Send PCM16 data in chunks to avoid overflowing the serial buffer
+    chunk_size = 256
+    for i in range(0, len(pcm_data), chunk_size):
+        ser.write(pcm_data[i:i+chunk_size])
+        time.sleep(0.002)  # small delay for stability
+
+    print("Playback complete.\n")
 # --------------------------
 # MAIN LOOP
 # --------------------------
@@ -182,7 +190,7 @@ try:
         print(text)
         reply = get_therapy_reply(text)
         pcm = tts_to_pcm(reply)
-        send_audio_to_esp32(pcm)
+        send_audio_to_arduino(pcm)
 
 except KeyboardInterrupt:
     exit()
