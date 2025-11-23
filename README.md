@@ -1,4 +1,5 @@
-# 🌟 **AURA — Adaptive Understanding & Responsive Assistant (Arduino + AI Voice Therapy Bot)**
+# 🌟 **AURA — Adaptive Understanding & Responsive Assistant** 
+   **(Arduino + AI Voice Therapy Bot)**
 
 *A compact, voice-activated AI companion built using the Arduino UNO R4, custom analog audio front-end, and a single Python backend (`bridge.py`).*
 
