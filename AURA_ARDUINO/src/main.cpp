@@ -52,7 +52,7 @@ void loop() {
             uint8_t pwmVal = map(sample, -32768, 32767, 0, 255);
             analogWrite(SPEAKER_PIN, pwmVal);
 
-            delayMicroseconds(PLAYBACK_PERIOD_US);
+            delayMicroseconds(PLAYBACK_PERIOD_US/2);
           }
         }
   }

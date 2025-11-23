@@ -135,7 +135,7 @@ def get_therapy_reply(text):
 # --------------------------
 def tts_to_pcm(text):
     print("Converting reply to speech...")
-    tts = gTTS(text)
+    tts = gTTS(text,lang="en", tld="com.au")
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
     tts.save(tmp.name)
 
@@ -143,7 +143,7 @@ def tts_to_pcm(text):
     if audio.ndim > 1:
         audio = audio[:, 0]  # mono
         
-    resampled = resampy.resample(audio, sr_, TARGET_RATE)
+    resampled = resampy.resample(audio, sr_orig=sr_,sr_new=TARGET_RATE)
 
     # Clip to avoid overshoot
     resampled = np.clip(resampled, -1.0, 1.0)
