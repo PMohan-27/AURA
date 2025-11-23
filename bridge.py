@@ -8,6 +8,7 @@ from gtts import gTTS
 import soundfile as sf
 import tempfile
 import resampy
+from datetime import datetime
 # --------------------------
 # CONFIG
 # --------------------------
@@ -22,7 +23,7 @@ AZURE_API_KEY = "ExLr27WBO13n6Hkzki6sPk6pa9z3htoUHUIWI5vwBfqehlI2ZxozJQQJ99BKACH
 AZURE_DEPLOYMENT = "gpt-4o-mini"                           # <-- CHECK THIS
 AZURE_API_VERSION = "2024-08-01-preview"
 
-
+memory = ""
 ser = serial.Serial(PORT, BAUD, timeout=0.1)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
@@ -105,7 +106,8 @@ def get_therapy_reply(text):
         "messages": [
             {
                 "role": "system",
-                "content": "You are a calm, supportive, friendly therapy assistant."
+                "content": "You are a calm, supportive, friendly therapy assistant. You are in grand river hospital, Kitchener, Ontario.  \n" + memory
+                +"If the user asks for time, tell them todays date / time (its in yyyy-mm-dd, and then hh:mm:ss):" + str(datetime.now())
             },
             {
                 "role": "user",
@@ -180,16 +182,19 @@ def send_audio_to_arduino(pcm_data):
 # --------------------------
 print("AI Therapy Bot Bridge Ready.")
 
+print(str(datetime.now()))
 try:
     while True:
         wav = record_audio()
         if wav is None:
             continue
-
         text = speech_to_text(wav)
         print(text)
+        memory += "User: " + text +  "\n"
         reply = get_therapy_reply(text)
         pcm = tts_to_pcm(reply)
+        memory += "Bot: " + reply + "\n"
+
         send_audio_to_arduino(pcm)
 
 except KeyboardInterrupt:
