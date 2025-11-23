@@ -9,7 +9,7 @@ This repo uses only **one Python file: `bridge.py`** to handle the entire pipeli
 
 ---
 
-# 📸 Hardware Overview (Your Circuit)
+# 📸 Hardware Overview 
 
 AURA uses:
 
@@ -84,7 +84,7 @@ It handles:
 
 ---
 
-# 📂 Project Structure (Accurate)
+# 📂 Project Structure 
 
 ```
 AURA/
@@ -102,9 +102,6 @@ AURA/
 └── README.md
 ```
 
-✔ No unnecessary modules
-✔ No extra Python files
-✔ Everything in one place
 
 ---
 
@@ -254,6 +251,3 @@ Waterloo Computer Engineering
 
 ---
 
-✅ Auto-format this into a **beautiful Markdown with emojis + spacing**
-
-Just tell me!
