@@ -1,169 +1,237 @@
-# 🌟 AURA — Arduino + AI Voice Therapy Bot
+# 🌟 **AURA — Arduino + AI Voice Therapy Bot**
 
-**Real-time Conversational Bot using Arduino UNO R4, Analog Mic, PAM8302A Speaker Amp, and a Single Python `bridge.py` Backend**
+*A compact, voice-activated AI companion built using the Arduino UNO R4, custom analog audio front-end, and a single Python backend (`bridge.py`).*
 
-AURA is a minimalistic but powerful voice-first AI bot designed for therapy-style or assistant-style conversations.
-It records audio through an electret mic, sends it to a Python backend for transcription → AI → TTS, and plays the generated audio back through a Class-D amplifier.
+AURA listens through an analog microphone, streams audio into a Python backend for **STT → AI → TTS**, and plays natural speech through a Class-D amplifier.
 
-This repo uses only **one Python file: `bridge.py`** to handle the entire pipeline.
-
----
-
-# 📸 Hardware Overview 
-
-AURA uses:
-
-* **Arduino UNO R4 Minima**
-* **SEN0487 analog microphone**
-* **PAM8302A mono Class-D speaker amplifier**
-* **10 µF AC coupling capacitors**
-* **PWM audio output**
-
-You provided the exact Altium schematic, and this README matches it 100%.
+This repository includes **hardware**, **firmware**, **Python backend**, and **3D-printable shell CAD** for a complete end-to-end build.
 
 ---
 
-## 🧩 Hardware Architecture
-
-```
- ┌────────────────────────────┐
- │         Arduino R4         │
- │  MIC_IN (A0) ◄─────┐        │
- │                     │        │
- │  SPK_OUT (D9) ──────┼──► PAM8302A ─► Speaker
- │                     │
- └─────────────────────┘
-         ▲
-         │
-   SEN0487 Analog Mic
-```
-
----
-
-## 🔌 Pin Connections
-
-### 🎤 Microphone (SEN0487 → Arduino)
-
-| SEN0487 Pin | Arduino Pin | Notes                        |
-| ----------- | ----------- | ---------------------------- |
-| VCC         | 3.3V        | Mic power                    |
-| GND         | GND         | Shared ground                |
-| OUT (A)     | A0 (MIC_IN) | Through 10 µF capacitor (C2) |
-
-> The 10 µF capacitor provides AC coupling and removes DC bias.
-
----
-
-### 🔊 Speaker Path (Arduino → PAM8302)
-
-| Arduino Pin  | PAM8302 Pin | Function            |
-| ------------ | ----------- | ------------------- |
-| D9 (SPK_OUT) | A+ (P1)     | PWM audio signal    |
-| GND          | A- (P2)     | Audio return        |
-| —            | SD (P3)     | Shutdown (not used) |
-| +5V          | VIN (P4)    | Power for amplifier |
-| GND          | GND (P5)    | Ground              |
-
-> C1 = 10 µF smoothing capacitor
-> R1 = 10k pulldown on SPK_OUT
-
----
-
-# 💻 Software Overview
-
-AURA uses a **single Python file**: `bridge.py`.
-It handles:
-
-* Serial communication
-* Raw audio preprocessing
-* Google Speech-to-Text
-* Azure / FLAN-T5 LLM inference
-* gTTS or TTS of your choice
-* Audio resampling
-* Playback to Arduino
-
----
-
-# 📂 Project Structure 
+# 📦 **Repository Structure**
 
 ```
 AURA/
 │
-├── arduino/
-│   └── firmware.ino
+├── AURA_ARDUINO/             # PlatformIO firmware project
+│   ├── src/main.cpp
+│   ├── include/
+│   ├── lib/
+│   ├── test/
+│   ├── .vscode/
+│   └── platformio.ini
 │
-├── python/
-│   └── bridge.py        # ONLY file handling all backend logic
+├── bridge.py                 # Single backend Python file (STT → LLM → TTS)
 │
 ├── docs/
-│   ├── schematic.png
-│   └── architecture.png
+│   ├── schematic.pdf         # Full electronics schematic
+│   ├── architecture.png      # System architecture diagram
+│   └── CAD/
+│       ├── AURA Shell UPPER.stl
+│       └── AURA Shell LOWER.stl
 │
-└── README.md
-```
-
-
----
-
-# 🧠 Full AI Pipeline (Inside bridge.py)
-
-```
-Microphone → Arduino ADC → Serial → Python bridge.py
-Python → Google STT → LLM (Azure GPT-4o Mini or FLAN-T5)
-→ TTS (gTTS / Coqui / Azure TTS)
-→ Python sends PCM → Arduino PWM → PAM8302 → Speaker
+├── resampled_resampy.wav     # Debug sample output
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-# ⚙️ Installation
+# 🧩 **Hardware Overview**
 
-### 1. Clone Repo
+AURA uses:
+
+* **Arduino UNO R4 Minima**
+* **SEN0487 Analog Electret Microphone**
+* **PAM8302A Class-D Audio Amplifier**
+* **Single-ended mic input (AC-coupled)**
+* **High-frequency PWM speaker output**
+* **Custom 3D-printed enclosure**
+
+---
+
+## 🔌 **Hardware Block Diagram**
+
+```
+ Mic → Arduino ADC → Serial → bridge.py →
+ Google STT → Azure GPT-4o Mini → TTS →
+ Arduino PWM → PAM8302 → Speaker
+```
+
+---
+
+# 🔧 **Electronics Wiring (Matches Your Schematic)**
+
+## 🎤 Microphone → Arduino
+
+| SEN0487 Pin | Arduino Pin | Notes                                 |
+| ----------- | ----------- | ------------------------------------- |
+| OUT         | A0 (MIC_IN) | Through 10 µF capacitor (AC coupling) |
+| VCC         | 3.3V        | Mic power                             |
+| GND         | GND         | Common ground                         |
+
+---
+
+## 🔊 Arduino → PAM8302 Amplifier → Speaker
+
+| Arduino Pin  | PAM8302 Pin | Purpose          |
+| ------------ | ----------- | ---------------- |
+| D9 (SPK_OUT) | A+          | PWM audio signal |
+| GND          | A-          | Ground           |
+| 5V           | VIN         | Amplifier power  |
+| GND          | GND         | Power ground     |
+
+Additional components used:
+
+* **C1 = 10 µF** (audio smoothing)
+* **R1 = 10k** (pull-down resistor for stable PWM idle)
+
+---
+
+# 📘 **Schematic & CAD Files**
+
+### 🔧 Electronics Schematic
+
+`docs/schematic.pdf`
+
+### 🧱 3D Printable Shell
+
+Located in `docs/CAD/`:
+
+* `AURA Shell UPPER.stl`
+* `AURA Shell LOWER.stl`
+
+---
+
+# 💻 **Firmware (Arduino / PlatformIO)**
+
+The Arduino code lives inside **`AURA_ARDUINO/`** and is built using **PlatformIO** (not Arduino IDE).
+
+---
+
+### 📁 **Firmware Structure**
+
+```
+AURA_ARDUINO/
+│
+├── src/main.cpp            # Main firmware logic
+├── include/
+├── lib/
+├── test/
+├── .vscode/
+└── platformio.ini
+```
+
+---
+
+### 🧠 **Firmware Responsibilities**
+
+`main.cpp` handles:
+
+* ADC sampling of microphone at ~6.5 kHz
+* Serial streaming of raw audio frames to Python
+* Receiving PCM audio from Python
+* Reconstructing audio via **high-frequency PWM** on D9
+* Synchronizing with Python's `bridge.py`
+
+---
+
+### ▶️ **Building the Firmware**
+
+From inside `AURA_ARDUINO/`:
+
+```bash
+pio run
+pio run --target upload
+```
+
+Or use VSCode PlatformIO:
+
+* ✔ Build
+* ✔ Upload
+* ✔ Serial Monitor
+
+---
+
+### ⚙ PlatformIO Config (Expected)
+
+```ini
+[env:uno_r4_minima]
+platform = renesas-ra
+board = uno_r4_minima
+framework = arduino
+monitor_speed = 921600
+```
+
+---
+
+# 🧠 **Python Backend (bridge.py)**
+
+The entire AI pipeline runs through one Python script.
+
+### Pipeline:
+
+```
+Audio → STT → GPT-4o Mini → TTS → Audio Playback
+```
+
+### Features inside `bridge.py`:
+
+* Serial connection to Arduino
+* Audio buffer and noise preprocessing
+* **Google STT**
+* **Azure GPT-4o Mini** (or FLAN-T5 fallback)
+* **gTTS / Coqui / Azure TTS**
+* WAV → PCM conversion
+* Sending PCM packets to Arduino
+
+---
+
+# ⚙ **Setup Instructions**
+
+### 1. Clone repo
 
 ```bash
 git clone https://github.com/l-krrish/AURA
 cd AURA
 ```
 
-### 2. Create Python Environment
+### 2. Create Python environment
 
 ```bash
 python -m venv .venv
-.\.venv\Scripts\activate   # Windows
+.\.venv\Scripts\activate
 ```
 
-### 3. Install Dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Add API Keys
-
-Inside `bridge.py`:
+### 4. Configure API keys (inside `bridge.py`)
 
 ```python
 AZURE_ENDPOINT = "https://therapy-bot.openai.azure.com/"
-AZURE_API_KEY = "your_key_here"
+AZURE_API_KEY = "<your key>"
 AZURE_DEPLOYMENT = "gpt-4o-mini"
+GOOGLE_CREDENTIALS = "credentials.json"
 ```
 
-Google STT:
+### 5. Upload firmware
 
-```python
-GOOGLE_CREDENTIALS = "path/to/credentials.json"
+Inside `AURA_ARDUINO/`:
+
+```bash
+pio run --target upload
 ```
 
 ---
 
-# ▶️ Running the Bot
-
-1. Plug in Arduino
-2. Upload `firmware.ino`
-3. Run:
+# ▶️ **Running AURA**
 
 ```bash
-python python/bridge.py
+python bridge.py
 ```
 
 You should see:
@@ -174,80 +242,60 @@ AI Therapy Bot Ready.
 Recording...
 ```
 
-Speak into the mic → bot replies → audio plays from speaker.
+Speak → AURA replies → audio plays.
 
 ---
 
-# 🎤 Audio Internals
+# 🚀 **Features**
 
-### Input (MIC):
-
-* Sampled at 6.5 kHz
-* 12-bit ADC
-* DC offset removed
-* Sent raw via serial to Python
-
-### Output (SPEAKER):
-
-* Arduino uses high-frequency PWM on D9
-* PAM8302 amplifies
-* Speaker plays clean audio
-
----
-
-# 🧪 Troubleshooting
-
-| Issue                                     | Fix                                                  |
-| ----------------------------------------- | ---------------------------------------------------- |
-| Bot responds with same message repeatedly | LLM prompt issue — update system prompt in bridge.py |
-| Audio weak                                | Use 5V USB-C power or larger capacitor on VIN        |
-| Mic noisy                                 | Ensure shielded wiring and clean 3.3V source         |
-| Python freezing                           | Use `timeout=None` and flush serial buffers          |
-
----
-
-# 🚀 Features
-
-* Full **voice → AI → voice** loop
-* Only **1 backend file**
+* Real-time conversational feedback
+* GPT-4o Mini reasoning
 * Hardware-accurate PWM audio
-* Works with **Arduino UNO R4 Minima**
-* Supports **Google STT + Azure GPT-4o Mini + gTTS**
-* Plug-and-play architecture
+* Full schematic + CAD for reproducibility
+* Single-file backend for simplicity
+* Custom enclosure design
 
 ---
 
-# 📈 Future Improvements
+# 🧪 **Future Improvements**
 
-* Wake-word ("AURA")
-* Noise suppression filters
-* Use ESP32-S3 + I2S mic for faster STT
-* Offline local LLM (Q4_0 GGUF) on laptop
-* Emotion detection via pitch analysis
-
----
-
-# 👤 Author
-
-**Krrish Lala**
- Waterloo Computer Engineering
-
-* GitHub: [https://github.com/l-krrish](https://github.com/l-krrish)
-* LinkedIn: [https://linkedin.com/in/krrish-lala/](https://linkedin.com/in/krrish-lala/)
-
-**Parasinder Mohan**
- Waterloo Computer Engineering
-
-* GitHub: [https://github.com/PMohan-27](https://github.com/PMohan-27)
-* LinkedIn: [https://www.linkedin.com/in/parasinder-mohan/](https://www.linkedin.com/in/parasinder-mohan/)
-
-**Luca Seaman**
- Waterloo Computer Engineering
-
-* GitHub: [https://github.com/LucaSeaman](https://github.com/LucaSeaman)
-* LinkedIn: [https://www.linkedin.com/in/luca-seaman/](https://www.linkedin.com/in/luca-seaman/)
-
-
+* Wake-word activation
+* Noise reduction filters
+* ESP32-S3 upgrade
+* Local quantized LLM support
+* LED expressions + servo motion
 
 ---
 
+# 👤 **Authors & Contributors**
+
+### **Krrish Lala**
+
+*Waterloo Computer Engineering*
+[![](https://img.shields.io/badge/GitHub-l--krrish-black?logo=github)](https://github.com/l-krrish)
+[![](https://img.shields.io/badge/LinkedIn-Krrish%20Lala-blue?logo=linkedin)](https://linkedin.com/in/krrish-lala)
+
+---
+
+### **Parasinder Mohan**
+
+*Waterloo Computer Engineering*
+[![](https://img.shields.io/badge/GitHub-PMohan--27-black?logo=github)](https://github.com/PMohan-27)
+[![](https://img.shields.io/badge/LinkedIn-Parasinder%20Mohan-blue?logo=linkedin)](https://www.linkedin.com/in/parasinder-mohan/)
+
+---
+
+### **Luca Seaman**
+
+*Waterloo Computer Engineering*
+[![](https://img.shields.io/badge/GitHub-LucaSeaman-black?logo=github)](https://github.com/LucaSeaman)
+[![](https://img.shields.io/badge/LinkedIn-Luca%20Seaman-blue?logo=linkedin)](https://www.linkedin.com/in/luca-seaman/)
+
+---
+
+🚀 A beautiful **top banner image**
+🚀 A **GIF demo** section
+🚀 A **table of contents**
+🚀 A **hardware diagram PNG** using your schematic
+
+Just tell me!
