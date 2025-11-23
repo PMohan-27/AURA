@@ -180,8 +180,8 @@ Audio → STT → GPT-4o Mini → TTS → Audio Playback
 * Serial connection to Arduino
 * Audio buffer and noise preprocessing
 * **Google STT**
-* **Azure GPT-4o Mini** (or FLAN-T5 fallback)
-* **gTTS / Coqui / Azure TTS**
+* **Azure GPT-4o Mini** 
+* **gTTS**
 * WAV → PCM conversion
 * Sending PCM packets to Arduino
 
@@ -292,10 +292,4 @@ Speak → AURA replies → audio plays.
 [![](https://img.shields.io/badge/LinkedIn-Luca%20Seaman-blue?logo=linkedin)](https://www.linkedin.com/in/luca-seaman/)
 
 ---
-
-🚀 A beautiful **top banner image**
-🚀 A **GIF demo** section
-🚀 A **table of contents**
-🚀 A **hardware diagram PNG** using your schematic
-
 Just tell me!
