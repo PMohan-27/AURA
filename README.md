@@ -292,4 +292,3 @@ Speak → AURA replies → audio plays.
 [![](https://img.shields.io/badge/LinkedIn-Luca%20Seaman-blue?logo=linkedin)](https://www.linkedin.com/in/luca-seaman/)
 
 ---
-Just tell me!
