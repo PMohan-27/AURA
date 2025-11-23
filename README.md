@@ -230,19 +230,19 @@ Speak into the mic → bot replies → audio plays from speaker.
 # 👤 Author
 
 **Krrish Lala**
-- Waterloo Computer Engineering
+ Waterloo Computer Engineering
 
 * GitHub: [https://github.com/l-krrish](https://github.com/l-krrish)
 * LinkedIn: [https://linkedin.com/in/krrish-lala/](https://linkedin.com/in/krrish-lala/)
 
 **Parasinder Mohan**
-- Waterloo Computer Engineering
+ Waterloo Computer Engineering
 
 * GitHub: [https://github.com/PMohan-27](https://github.com/PMohan-27)
 * LinkedIn: [https://www.linkedin.com/in/parasinder-mohan/](https://www.linkedin.com/in/parasinder-mohan/)
 
 **Luca Seaman**
-- Waterloo Computer Engineering
+ Waterloo Computer Engineering
 
 * GitHub: [https://github.com/LucaSeaman](https://github.com/LucaSeaman)
 * LinkedIn: [https://www.linkedin.com/in/luca-seaman/](https://www.linkedin.com/in/luca-seaman/)
