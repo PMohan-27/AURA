@@ -266,7 +266,27 @@ Speak → AURA replies → audio plays.
 * LED expressions + servo motion
 
 ---
+# 📊 Project Stats
 
+### **Repository Overview**
+![Repo Size](https://img.shields.io/github/repo-size/PMohan-27/AURA)
+![Code Size](https://img.shields.io/github/languages/code-size/PMohan-27/AURA)
+![Languages](https://img.shields.io/github/languages/top/PMohan-27/AURA)
+![Language Count](https://img.shields.io/github/languages/count/PMohan-27/AURA)
+
+### **Activity**
+![Commit Activity](https://img.shields.io/github/commit-activity/m/PMohan-27/AURA)
+![Last Commit](https://img.shields.io/github/last-commit/PMohan-27/AURA)
+![Commits Since Latest Release](https://img.shields.io/github/commits-since/PMohan-27/AURA/latest)
+
+### **Versioning & License**
+![License](https://img.shields.io/github/license/PMohan-27/AURA)
+![Issues](https://img.shields.io/github/issues/PMohan-27/AURA)
+![Pull Requests](https://img.shields.io/github/issues-pr/PMohan-27/AURA)
+![Repo Stars](https://img.shields.io/github/stars/PMohan-27/AURA)
+![Forks](https://img.shields.io/github/forks/PMohan-27/AURA)
+
+---
 # 👤 **Authors & Contributors**
 
 ### **Krrish Lala**
