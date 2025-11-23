@@ -82,7 +82,7 @@ def speech_to_text(wav_path):
         return "FAIL"
 
 # --------------------------
-# STEP 3: Hugging Face Therapy Model
+# STEP 3: Azure gpt-o4-mini Therapy module
 # --------------------------
 def get_therapy_reply(text):
     if not text:
