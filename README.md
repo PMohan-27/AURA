@@ -1,9 +1,3 @@
-Here is your **FULL, UPDATED, HARDWARE-ACCURATE, AI-STACK-READY README** for your GitHub project.
-It includes **your exact circuit**, **Arduino R4 + PAM8302A + SEN0487**, **software architecture**, **Python bridge**, **AI pipeline**, **installation**, **usage**, and **future improvements**.
-
-You can **copy-paste this directly into README.md**.
-
----
 
 # 🌟 AURA — Arduino + ESP32 AI Therapy Bot
 
