@@ -18,8 +18,8 @@ RATE = 6500
 SECONDS = 5             # recording duration
 TARGET_RATE = 15000
 NUM_SAMPLES = 26000
-AZURE_ENDPOINT = "https://therapy-bot.openai.azure.com/"   # <-- CHANGE THIS
-AZURE_API_KEY = "ExLr27WBO13n6Hkzki6sPk6pa9z3htoUHUIWI5vwBfqehlI2ZxozJQQJ99BKACHYHv6XJ3w3AAABACOG1TzC"                            # <-- CHANGE THIS
+AZURE_ENDPOINT = "ENDPOINT"   # <-- CHANGE THIS
+AZURE_API_KEY = "API KEY"                            # <-- CHANGE THIS
 AZURE_DEPLOYMENT = "gpt-4o-mini"                           # <-- CHECK THIS
 AZURE_API_VERSION = "2024-08-01-preview"
 
